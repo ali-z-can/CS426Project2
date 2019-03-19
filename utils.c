@@ -12,7 +12,7 @@ int readDoc(char *docName,int **arr2,int docSize){
     int i,j;
     int *arr;
     i = 0;
-    fprintf(stderr,"arr2 addres = %d\n",arr2);
+    //fprintf(stderr,"arr2 addres = %d\n",arr2);
 
     //moved to main to have it as a return array
     //int **arr2;
@@ -48,7 +48,7 @@ int readDoc(char *docName,int **arr2,int docSize){
 
         }*/
 
-        fprintf(stderr,"\ni = %d\n",i);
+        //fprintf(stderr,"\ni = %d\n",i);
 
         //collect lines (id weight vector pairs) together in a 2D array
         arr2 = (int**) realloc(arr2,(i+1)*(sizeof(int*)));
@@ -66,5 +66,16 @@ int readDoc(char *docName,int **arr2,int docSize){
         }
     }
      */
+    fclose(fp);
     return i;
+}
+
+void readQ(char *qName,int *qarr,int docSize){
+    FILE *fp;
+    fp = fopen(qName,"r");
+    int i;
+    for(i = 0; i<docSize;i++){
+        fscanf(fp,"%d",&qarr[i]);
+    }
+    fclose(fp);
 }

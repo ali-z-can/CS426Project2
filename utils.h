@@ -4,6 +4,8 @@
 
 #ifndef PROJECT2_UTILS_H
 #define PROJECT2_UTILS_H
+
 int readDoc(char *docName,int **arr2,int dccSize);
+void readQ(char *qName,int *qarr,int docSize);
 
 #endif //PROJECT2_UTILS_H
