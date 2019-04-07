@@ -3,6 +3,7 @@
 #include "utils.h"
 #include <mpi.h>
 #include <math.h>
+#include <sys/time.h>
 
 typedef struct mytype_s
 {
@@ -104,6 +105,7 @@ void CreateMyMpiFunc(){
 void kreduce(int * leastk, int * myids, int * myvals, int k, int world_size, int my_rank);
 int main(int argc,char **argv) {
 
+    struct timeval serialbegin,parallelbegin,serialend,parallelend;
     int size,rank;
     MPI_Status s;
     int docSize,numberOfLines;
@@ -121,16 +123,18 @@ int main(int argc,char **argv) {
         int **array;
         int *qarr;
         docSize = atoi(argv[1]);
+
         qarr = (int*)calloc(docSize, sizeof(int));
         //information given in util.c
-        array = (int**)calloc(0, sizeof(int*));
+        //todo i2
+        //array = (int**)calloc(0, sizeof(int*));
         /*
          * Debug
          * fprintf(stderr,"array addres = %d\n",array);
          */
-
+        gettimeofday(&serialbegin,NULL);
         int dumy;
-        numberOfLines = readDoc(argv[3],array,docSize);
+        array = readDoc2(argv[3],&numberOfLines,docSize);
 
         int q,j;
         readQ(argv[4],qarr,docSize);
@@ -193,10 +197,21 @@ int main(int argc,char **argv) {
             arraytohopefullysend2[i] = i+1;
         }
 
-
+        gettimeofday(&serialend,NULL);
+        gettimeofday(&parallelbegin,NULL);
         kreduce(scounts,arraytohopefullysend2,arraytohopefullysend,k,size,rank);
+        gettimeofday(&parallelend,NULL);
 
+        int sert,part;
+        sert = ((serialend.tv_sec - serialbegin.tv_sec)*1000 + (serialend.tv_usec - serialbegin.tv_usec));
 
+        part = ((parallelend.tv_sec - parallelbegin.tv_sec)*1000 + (parallelend.tv_usec - parallelbegin.tv_usec));
+        fprintf(stderr,"Sequential part: %ld ms\nParallel part: %ld ms \nTotal time: %ld\n",((serialend.tv_sec - serialbegin.tv_sec)*1000000L + (serialend.tv_usec - serialbegin.tv_usec)),((parallelend.tv_sec - parallelbegin.tv_sec)*1000000L + (parallelend.tv_usec - parallelbegin.tv_usec)),((parallelend.tv_sec - parallelbegin.tv_sec)*1000000L + (parallelend.tv_usec - parallelbegin.tv_usec))+((serialend.tv_sec - serialbegin.tv_sec)*1000000L + (serialend.tv_usec - serialbegin.tv_usec)));
+        fprintf(stderr,"Least k = %d ids:\n",k);
+        for(int i = 0; i < k;i++){
+            fprintf(stderr,"%d\n",scounts[i]);
+
+        }
     }
 
     else{
@@ -233,7 +248,7 @@ void kreduce(int * leastk, int * myids, int * myvals, int k, int world_size, int
     MPI_Op MyOp;
     MPI_Op_create((MPI_User_function *) compareDocs,1,&MyOp);
     //---------------------------------------------------------------------------------------------------------------
-
+;
 
     int docSize;
 
@@ -331,7 +346,7 @@ void kreduce(int * leastk, int * myids, int * myvals, int k, int world_size, int
         }
         docs[j].id = recArr[j];
         docs[j].val = sum;
-        fprintf(stderr,"rank: %d added %d with id %d to %d\n",my_rank,docs[j].val,docs[j].id,j);
+        //fprintf(stderr,"rank: %d added %d with id %d to %d\n",my_rank,docs[j].val,docs[j].id,j);
         sum = 0;
     }
     /*
@@ -366,7 +381,9 @@ void kreduce(int * leastk, int * myids, int * myvals, int k, int world_size, int
     if(my_rank==0)
     {
         for(forCounter=0;forCounter<k;forCounter++){
-            fprintf(stderr,"id: %d val: %d\n",globalGetReduced[forCounter].id,globalGetReduced[forCounter].val);
+            //fprintf(stderr,"id: %d val: %d\n",globalGetReduced[forCounter].id,globalGetReduced[forCounter].val);
+            //myvals[forCounter] = globalGetReduced[forCounter].val;
+            leastk[forCounter] = globalGetReduced[forCounter].id;
         }
     }
 

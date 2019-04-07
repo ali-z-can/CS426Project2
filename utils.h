@@ -7,5 +7,5 @@
 
 int readDoc(char *docName,int **arr2,int dccSize);
 void readQ(char *qName,int *qarr,int docSize);
-
+int ** readDoc2(char* docName,int* holo,int docSize);
 #endif //PROJECT2_UTILS_H

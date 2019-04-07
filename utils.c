@@ -7,6 +7,7 @@
 
 int readDoc(char *docName,int **arr2,int docSize){
 
+
     FILE *fp;
     fp = fopen(docName,"r");
     int i,j;
@@ -57,16 +58,17 @@ int readDoc(char *docName,int **arr2,int docSize){
         //fprintf(stderr,"arr = %d arr2[i] = %d \n",arr,arr2[i][0]);
         i++;
     }
-    /*
+
     int q;
     for(j = 0; j<i;j++){
         for (q = 0; q < docSize+1; q++) {
             //fprintf(stderr,"j: %d q: %d\n",j,q);
-            fprintf(stderr,"arr[%d][%d] = %d \n",i,q,arr2[j][q]);
+            fprintf(stderr,"arr[%d][%d] = %d \n",j,q,arr2[j][q]);
         }
     }
-     */
+
     fclose(fp);
+
     return i;
 }
 
@@ -78,4 +80,44 @@ void readQ(char *qName,int *qarr,int docSize){
         fscanf(fp,"%d",&qarr[i]);
     }
     fclose(fp);
+}
+
+int ** readDoc2(char* docName,int* holo,int docSize){
+    FILE *fp ;
+    int i,sz,forCounter1,forCounter2;
+    char c;
+    sz = 0;
+    fp = fopen(docName,"r");
+    while(!feof(fp)){
+
+
+        fscanf(fp,"%c",&c);
+        if(c == '\n') {
+            sz++;
+        }
+    }
+    sz--;
+    rewind(fp);
+
+    int retarr[sz][docSize+1];
+    int *retarr1,**retarr2;
+    retarr2 = (int**)calloc(sz, sizeof(int*));
+
+    for(forCounter1 = 0; forCounter1 < sz;forCounter1++){
+        retarr1 = (int*)calloc(docSize+1,(sizeof(int)));
+        for (forCounter2 = 0; forCounter2 < docSize+1 ; forCounter2++) {
+            fscanf(fp,"%d",&retarr1[forCounter2]);
+            if(forCounter2==0){
+                fscanf(fp,"%c",&c);
+            }
+
+        }
+        retarr2[forCounter1] = retarr1;
+
+    }
+
+    *holo = sz;
+    return retarr2;
+
+
 }
